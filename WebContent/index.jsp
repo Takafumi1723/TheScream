@@ -8,5 +8,10 @@
 </head>
 <body>
 <h1>Welcome to The Scream.</h1>
+<form action="/TheScream/Login" method="post">
+UserName：<input type="text" name="name"><br>
+Password：<input type="text" name="pass"><br>
+<input type="submit" value="Login">
+</form>
 </body>
 </html>
