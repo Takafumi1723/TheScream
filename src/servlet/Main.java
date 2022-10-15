@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import model.PostScreamLogic;
 import model.Scream;
 import model.User;
 
@@ -53,12 +54,34 @@ public class Main extends HttpServlet {
 		}
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
 
+		// リクエストパラメータを取得
+		request.setCharacterEncoding("UTF-8");
+		String text = request.getParameter("text");
+
+		// 入力値チェック
+		if(text != null && text.length() != 0)
+		{
+			// アプリケーションスコープに保存済みのScreamリストを取得する
+			ServletContext application = this.getServletContext();
+			List<Scream> screamList = (List<Scream>) application.getAttribute("screamList");
+
+			// セッションスコープに保存済みのユーザ情報を取得する
+			HttpSession session = request.getSession();
+			User loginUser = (User) session.getAttribute("loginUser");
+
+			// Screamをリストに追加する
+			Scream scream = new Scream(loginUser.getName(), text);
+			PostScreamLogic postScreamLogic = new PostScreamLogic();
+			postScreamLogic.execute(scream, screamList);
+
+			// アプリケーションスコープにScreamリストを保存
+			application.setAttribute("screamList", screamList);
+		}
+
+		// メイン画面にフォワード
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/main.jsp");
+		dispatcher.forward(request, response);
+	}
 }
